@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 
-let numbers = [
+app.use(express.json())
+
+let contacts = [
     {
         id: 1,
         name: 'Arto Hellas',
@@ -29,12 +31,12 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(numbers)
+    response.json(contacts)
 })
 
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const contact = numbers.find(number => number.id === id)
+    const contact = contacts.find(number => number.id === id)
 
     if (contact) {
         response.json(contact)
@@ -47,16 +49,31 @@ app.get('/info', (request, response) => {
     const timestamp = new Date()
 
     response.send(`
-    <p>Phonebook has info for ${numbers.length} people</p>
+    <p>Phonebook has info for ${contacts.length} people</p>
     <p>${timestamp}</p>
     `)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    numbers = numbers.filter(number => number.id !== id)
+    contacts = contacts.filter(number => number.id !== id)
 
     response.status(204).end()
+})
+
+const createRandomId = () => Math.floor(Math.random() * 1000000)
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+
+    const newContact = {
+        id: createRandomId(),
+        name: body.name,
+        number: body.number
+    }
+
+    contacts = contacts.concat(newContact)
+    response.json(newContact)
 })
 
 const PORT = 3001
