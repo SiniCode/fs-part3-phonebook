@@ -2,10 +2,20 @@ const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
-const tinyMorgan = morgan('tiny')
-
 app.use(express.json())
-app.use(tinyMorgan)
+
+// const tinyMorgan = morgan('tiny')
+// app.use(tinyMorgan)
+
+morgan.token('body', (request, response) => {
+    if (request.method === 'POST') {
+        return JSON.stringify(request.body)
+    }
+    return ''
+})
+const customMorgan = morgan(':method :url :status :res[content-length] - :response-time ms :body')
+app.use(customMorgan)
+
 
 let contacts = [
     {
